@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/shanmugara/spireauthlib"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,14 +17,17 @@ func GetCert(server string) error {
 	if Logger == nil {
 		Logger = logrus.New()
 	}
+
 	ctx := context.Background()
-	client, err := GetTlsClient(ctx)
+
+	cauth := spireauthlib.ClientAuth{Logger: Logger}
+	client, err := cauth.GetTlsClient(ctx)
 	if err != nil {
 		Logger.Errorf("Failed to create TLS client: %v", err)
 		return err
 	}
 
-	// marshal SampleCSR to JSON
+	// marshal SampleCSR to JSON and send as the request body
 	payload, err := json.Marshal(SampleCSR)
 	if err != nil {
 		Logger.Errorf("Failed to marshal SampleCSR: %v", err)
